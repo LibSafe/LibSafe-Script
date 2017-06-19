@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# LibSafe
+# LibSafe 0.1.0
 
 # Links
 # * Array from `find` > https://stackoverflow.com/questions/23356779/how-can-i-store-find-command-result-as-arrays-in-bash
@@ -18,7 +18,7 @@ if [ -z "$FOLDER" ]; then
     exit -1
 fi
 
-function randomString() 
+function randomString()
 {
 	RETURN=`cat /dev/random | LC_CTYPE=C tr -dc "[:alpha:]" | head -c 16`
 }
@@ -45,7 +45,7 @@ function findLibSafeHeader()
 	LIBSAFE_HEADER_FILE="$(find ${FOLDER} -type f -name 'LibSafe-Header.h')"
 }
 
-function getAllHeaderFiles() 
+function getAllHeaderFiles()
 {
 	ARRAY=()
 	while IFS=  read -r -d $'\0'; do
@@ -54,7 +54,7 @@ function getAllHeaderFiles()
 	RETURN=("${ARRAY[@]}")
 }
 
-function getAllImplementationFiles() 
+function getAllImplementationFiles()
 {
 	ARRAY=()
 	while IFS=  read -r -d $'\0'; do
@@ -64,7 +64,7 @@ function getAllImplementationFiles()
 }
 
 function getAllObjectiveCFiles()
-{	
+{
 	getAllHeaderFiles; HEADERS=("${RETURN[@]}")
 	getAllImplementationFiles; IMPLEMENTATIONS=("${RETURN[@]}")
 	RETURN=("${HEADERS[@]}" "${IMPLEMENTATIONS[@]}") # Combine the arrays
@@ -86,7 +86,7 @@ function getInterfacesInFile() # $1 file
 	RETURN=("${RESULTS[@]}")
 }
 
-function scopeProtocolsAndInterfacesInFile() # $1 file, $2 scope 
+function scopeProtocolsAndInterfacesInFile() # $1 file, $2 scope
 {
 	echo -e "\n\nProcessing file: '$1'"
 
@@ -107,28 +107,28 @@ function scopeProtocolsAndInterfacesInFile() # $1 file, $2 scope
 	TOP_INSERT="/* LibSafe definition START */
 
 /**
- *  LibSafe adds defines to your classes with random names so that your code 
+ *  LibSafe adds defines to your classes with random names so that your code
  *  can be imported multiple times without symbol conflicts.
  *
- *  Thanks to LibSafe and the generated defines below you can use this class 
- *  in your closed source library even if someone else has included the same 
+ *  Thanks to LibSafe and the generated defines below you can use this class
+ *  in your closed source library even if someone else has included the same
  *  exact class.
  *
- *  Read more at: https://github.io/libsafe
+ *  Read more at: https://github.com/libsafe
  */
 "
 	echo ""
 	## Append the $2 (scope) to the end of the protocol name
 	for i in "${PROTOCOLS_AND_INTERFACES[@]}"
 	do
-		## Append the 
+		## Append the
 		DEFINE_STRING="#define ${i} ${i}${2}"
 		DEFINES+=($DEFINE_STRING)
 		## Add a #define for each protocol `#define _ORIGINAL_NAME_ _SCOPED_NAME_` to top of $1 (file)
 		echo -e "Add define string: \n'${DEFINE_STRING}'"
 
 		## Insert the define string at the top of the file
-		# sed -i -e "2i\ 
+		# sed -i -e "2i\
 		# ${DEFINE_STRING}
 		# " $1
 		TOP_INSERT+="${DEFINE_STRING}\n"
@@ -144,8 +144,8 @@ function scopeProtocolsAndInterfacesInFile() # $1 file, $2 scope
 	RETURN=("${DEFINES[@]}");
 }
 
-function replaceLibSafeHeader() 
-{	
+function replaceLibSafeHeader()
+{
 	## Do not continue if no header file as $1
 	if [ -z "$LIBSAFE_HEADER_FILE" ]; then
 		return 0
@@ -158,21 +158,21 @@ function replaceLibSafeHeader()
 	HEADER_CONTENT="/* LibSafe Auto Generated Header */
 
 /**
- *  LibSafe adds defines to your classes with random names so that your code 
+ *  LibSafe adds defines to your classes with random names so that your code
  *  can be imported multiple times without symbol conflicts.
  *
- *  Thanks to LibSafe and the generated defines below you can use this class 
- *  in your closed source library even if someone else has included the same 
+ *  Thanks to LibSafe and the generated defines below you can use this class
+ *  in your closed source library even if someone else has included the same
  *  exact class.
  *
- *  Read more at: https://github.io/libsafe
+ *  Read more at: https://github.com/libsafe
  */
 
  /**
-  *  The unique random string used to scope your classes. 
-  *  
-  *  You can use this define to scope your folder/file names when you write 
-  *  to disk to make sure you are not conflicting with other implementations 
+  *  The unique random string used to scope your classes.
+  *
+  *  You can use this define to scope your folder/file names when you write
+  *  to disk to make sure you are not conflicting with other implementations
   *  of the same (your) code.
   */
  #define LIBSAFE_RANDOM @\"${RANDOM_STRING}\"
@@ -201,4 +201,3 @@ replaceLibSafeHeader
 
 
 echo -e "\n\nDone!"
-

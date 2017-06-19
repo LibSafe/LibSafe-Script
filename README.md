@@ -65,5 +65,11 @@ end
 Patrik Nyblad, patrik.nyblad@gmail.com
 
 
+## Changelog
+
+#### 0.1.0
+First release of LibSafe
+
+
 ## License
 LibSafe is available under the MIT license. See the LICENSE file for more info.
